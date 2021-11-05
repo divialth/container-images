@@ -42,7 +42,7 @@ jobs:
 
       - name: build application
         run: |
-          gem install --no-ri --no-rdoc fpm
+          gem install fpm
           cd drone-fpm/sources
           make build
           ./out/generate-entrypoint
