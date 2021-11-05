@@ -9,6 +9,6 @@ RUN yum install -y --disableplugin=subscription-manager rpm-build && \
 
 RUN gem install fpm
 
-COPY sources/out/entrypoint.sh /bin/entrypoint.sh
+COPY entrypoint.sh /bin/entrypoint.sh
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
