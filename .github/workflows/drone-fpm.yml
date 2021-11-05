@@ -42,9 +42,9 @@ jobs:
 
       - name: build application
         run: |
+          gem install --no-ri --no-rdoc fpm
           cd drone-fpm/sources
           make build
-          find .
           ./out/generate-entrypoint
 
       - name: Log into registry ${{ env.REGISTRY }}
