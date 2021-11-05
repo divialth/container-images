@@ -48,7 +48,7 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: entrypoint.sh
+          name: entrypoint
           path: out/entrypoint.sh
 
 
@@ -66,7 +66,7 @@ jobs:
       - name: download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: entrypoint.sh
+          name: entrypoint
           
       - name: Display structure of downloaded files
         run: ls -R
