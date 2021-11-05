@@ -18,7 +18,41 @@ env:
 
 
 jobs:
-  build:
+  build-app:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout drone-fpm repo
+        uses: actions/checkout@v2
+        with:
+          repository: betterengineering/drone-fpm
+
+      - name: Prepare Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+
+      - name: Install dependencies
+        run: gem install fpm
+
+      - name: build entrypoint generator
+        run: make build
+
+      - name: generate entrypoint
+        run: ./out/generate-entrypoint
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: entrypoint.sh
+          path: out/entrypoint.sh
+
+
+  build-container:
 
     runs-on: ubuntu-latest
     permissions:
@@ -29,23 +63,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Checkout dron-fpm repo
-        uses: actions/checkout@v2
+      - name: download artifacts
+        uses: actions/download-artifact@v2
         with:
-          repository: betterengineering/drone-fpm
-          path: drone-fpm/sources
-
-      - name: Prepare Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7
-
-      - name: build application
-        run: |
-          gem install fpm
-          cd drone-fpm/sources
-          make build
-          ./out/generate-entrypoint
+          name: entrypoint.sh
+          
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
