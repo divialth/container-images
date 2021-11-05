@@ -11,4 +11,6 @@ RUN gem install fpm
 
 COPY entrypoint.sh /bin/entrypoint.sh
 
+RUN chmod 755 /bin/entrypoint.sh
+
 ENTRYPOINT ["/bin/entrypoint.sh"]
