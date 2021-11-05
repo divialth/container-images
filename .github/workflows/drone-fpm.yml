@@ -58,6 +58,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    
+    needs:
+      - build-app
 
     steps:
       - name: Checkout repository
