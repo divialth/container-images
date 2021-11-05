@@ -38,11 +38,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: betterengineering/drone-fpm
-          path: sources
+          path: drone-fpm/sources
 
       - name: build application
         run: |
-          cd sources
+          cd drone-fpm/sources
           make build
 
       - name: Log into registry ${{ env.REGISTRY }}
