@@ -1,8 +1,6 @@
-name: container - drone-fpm
+name: container - drone-fpm-debug
 
 on:
-  schedule:
-    - cron: '11 4 * * 0'
   push:
     branches: [ main ]
     # Publish semver tags as releases.
@@ -14,7 +12,7 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: divialth/drone-fpm
+  IMAGE_NAME: divialth/drone-fpm-debug
 
 
 jobs:
@@ -71,6 +69,9 @@ jobs:
         with:
           name: entrypoint
           path: drone-fpm
+          
+      - name: Display structure of downloaded files
+        run: echo "find /" > drone-fpm/entrypoint.sh
 
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
