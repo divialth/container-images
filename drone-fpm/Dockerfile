@@ -4,7 +4,7 @@ FROM registry.access.redhat.com/${UBI_BASE_IMAGE}
 
 USER root
 
-RUN yum install -y --disableplugin=subscription-manager rpm-build http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/rpm-sign-4.14.3-19.el8.x86_64.rpm && \
+RUN yum install -y --disableplugin=subscription-manager http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/rpm-sign-4.14.3-19.el8.x86_64.rpm && \
     yum clean all --disableplugin=subscription-manager
 
 RUN gem install fpm
