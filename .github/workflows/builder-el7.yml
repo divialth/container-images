@@ -1,4 +1,4 @@
-name: container - builder-el8
+name: container - builder-el7
 
 on:
   schedule:
@@ -14,9 +14,9 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: divialth/builder-el8
+  IMAGE_NAME: divialth/builder-el7
   # base path to the dockerfile
-  DOCKERFILE_PATH: builder/el8
+  DOCKERFILE_PATH: builder/el7
 
 
 jobs:
