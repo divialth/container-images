@@ -7,6 +7,8 @@ on:
     branches: [ main ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    paths:
+      - samba-domain/**
   pull_request:
     branches: [ main ]
 

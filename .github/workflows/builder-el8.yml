@@ -7,6 +7,8 @@ on:
     branches: [ main ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    paths:
+      - builder/el8/**
   pull_request:
     branches: [ main ]
 
