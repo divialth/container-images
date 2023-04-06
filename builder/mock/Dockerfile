@@ -4,7 +4,7 @@ USER root
 
 RUN dnf install -y epel-release && \
     crb enable
-RUN dnf install -y rpm-build rpm-sign mock && \
+RUN dnf install -y rpm-build rpm-sign rpmdevtools mock && \
     yum clean all
 
 RUN useradd mockbuilder
