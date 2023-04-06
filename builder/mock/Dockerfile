@@ -11,4 +11,7 @@ RUN useradd mockbuilder
 RUN usermod -a -G mock mockbuilder
 
 USER mockbuilder
+
+RUN mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+
 WORKDIR /build
