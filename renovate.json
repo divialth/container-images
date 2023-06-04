@@ -5,9 +5,8 @@
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
       "enabled": false
     }
   ]
