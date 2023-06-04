@@ -1,0 +1,22 @@
+name: keepalive
+
+on:
+  schedule:
+    - cron: '30 4 * * *'
+
+jobs:
+  keepalive:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Keepalive
+        uses: gautamkrishnar/keepalive-workflow@v1
+        with:
+          committer_username: "divialth-bot"
+          committer_email: "bot@dummy-domain.tld"

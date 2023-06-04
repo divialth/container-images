@@ -54,9 +54,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Keepalive
-        uses: gautamkrishnar/keepalive-workflow@v1
-        with:
-          committer_username: "divialth-bot"
-          committer_email: "bot@dummy-domain.tld"
