@@ -1,6 +1,4 @@
-ARG UBI_BASE_IMAGE=ubi8/ruby-27
-
-FROM registry.access.redhat.com/${UBI_BASE_IMAGE}
+FROM registry.access.redhat.com/ubi8/ruby-30@sha256:3ea98761f3d620d2607dce2943c02faff6c55ade4d6ecc9ee2bf32f047b1dfc4
 
 USER root
 
