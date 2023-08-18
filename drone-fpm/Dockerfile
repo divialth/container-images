@@ -5,7 +5,8 @@ USER root
 RUN yum install -y --disableplugin=subscription-manager rpm-build && \
     yum clean all --disableplugin=subscription-manager
 
-RUN gem install fpm
+# renovate: datasource=rubygems versioning=ruby
+RUN gem install fpm -v 1.15.1
 
 COPY entrypoint.sh /bin/entrypoint.sh
 
