@@ -17,6 +17,8 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: divialth/drone-fpm
+  # renovate: datasource=rubygems depName=fpm versioning=ruby
+  FPM_VERSION: 1.15.1
 
 
 jobs:
@@ -36,10 +38,10 @@ jobs:
       - name: Prepare Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: 3.0
 
       - name: Install dependencies
-        run: gem install fpm
+        run: gem install --no-document fpm -v ${{ env.FPM_VERSION }}
 
       - name: build entrypoint generator
         run: make build
