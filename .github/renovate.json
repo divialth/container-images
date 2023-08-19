@@ -1,14 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "configMigration": true,
   "extends": [
-    "config:base",
-    "default:automergeDigest"
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
-    }
+    "config:recommended",
+    "default:automergeDigest",
+    "docker:disableMajor",
+    "regexManagers:dockerfileVersions",
+    "regexManagers:githubActionsVersions"
   ]
 }
