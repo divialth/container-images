@@ -7,7 +7,7 @@ RUN yum install -y --disableplugin=subscription-manager rpm-build && \
 
 # renovate: datasource=rubygems depName=fpm versioning=ruby
 ENV FPM_VERSION 1.15.1
-RUN gem install --no-rdoc --no-ri  fpm -v ${FPM_VERSION}
+RUN gem install --no-document fpm -v ${FPM_VERSION}
 
 COPY entrypoint.sh /bin/entrypoint.sh
 
