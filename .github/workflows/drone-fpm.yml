@@ -38,7 +38,7 @@ jobs:
       - name: Prepare Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0
+          ruby-version: '3.0'
 
       - name: Install dependencies
         run: gem install --no-document fpm -v ${{ env.FPM_VERSION }}
