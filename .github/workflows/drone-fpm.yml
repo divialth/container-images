@@ -8,9 +8,13 @@ on:
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
     paths:
+      - .github/workflows/drone-fpm.yml
       - drone-fpm/**
   pull_request:
     branches: [ main ]
+    paths:
+      - .github/workflows/drone-fpm.yml
+      - drone-fpm/**
 
 env:
   # Use docker.io for Docker Hub if empty
