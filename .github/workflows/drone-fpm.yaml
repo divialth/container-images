@@ -1,8 +1,6 @@
 name: container - drone-fpm
 
 on:
-  schedule:
-    - cron: '11 4 * * 0'
   push:
     branches: [ main ]
     # Publish semver tags as releases.
