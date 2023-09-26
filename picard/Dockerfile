@@ -8,13 +8,15 @@ LABEL maintainer="divialth"
 
 # title
 ENV TITLE=Picard
+# renovate: datasource=repology depName=alpine_edge/picard-tagger versioning=loose
+ENV PICARD_VERSION="2.9.1-r0"
 
 RUN \
-  echo "**** install packages ****" && \
-  apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community \
-    picard && \
-  echo "**** cleanup ****" && \
-  rm -rf \
+    echo "**** install packages ****" && \
+    apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community \
+    picard="${PICARD_VERSION}" && \
+    echo "**** cleanup ****" && \
+    rm -rf \
     /tmp/*
 
 # add local files
