@@ -8,7 +8,7 @@ LABEL maintainer="divialth"
 
 # title
 ENV TITLE=Picard
-# renovate: datasource=repology depName=alpine_edge/picard-tagger versioning=loose
+# renovate: datasource=repology depName=alpine_edge/picard versioning=loose
 ENV PICARD_VERSION="2.9.1-r0"
 
 RUN \
