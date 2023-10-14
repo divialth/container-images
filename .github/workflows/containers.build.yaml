@@ -95,7 +95,7 @@ jobs:
         fi
         if [ "${{github.event_name}}" == "pull_request" ]; then
           echo "push=false" >> $GITHUB_OUTPUT
-          echo "cache_from=\"type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache\"" >> $GITHUB_OUTPUT || echo "cache_from=''" >> $GITHUB_OUTPUT
+          echo 'cache_from="type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache"' >> $GITHUB_OUTPUT || echo 'cache_from=""' >> $GITHUB_OUTPUT
           echo 'cache_to=""' >> $GITHUB_OUTPUT
         else
           echo "push=true" >> $GITHUB_OUTPUT
@@ -146,6 +146,14 @@ jobs:
         cache-from: ${{ steps.prep.outputs.cache_from }}
         cache-to: ${{ steps.prep.outputs.cache_to }}
         tags: ${{ steps.meta.outputs.tags }}
+
+  container-build-complete:
+    needs: [build]
+    name: Container Build Completed
+    runs-on: ubuntu-latest
+    steps:
+      - name: complete message
+        run: echo "Container Build and Tests Completed Successfully"
 
 # NOTE
 # many of this code was copied from the great workflow of truechats/containers
