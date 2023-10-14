@@ -44,7 +44,7 @@ jobs:
         echo "containers<<EOF" >> $GITHUB_ENV
         echo "${CONTAINERS}" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
-        echo $env.containers
+        echo ${{ env.containers }}
 
   hadolint:
     name: Run hadolint
