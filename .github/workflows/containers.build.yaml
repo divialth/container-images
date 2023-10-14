@@ -40,11 +40,13 @@ jobs:
     - id: reduce
       run: |
         CONTAINERS=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)
-        echo $CONTAINERS
+        echo "test1: $CONTAINERS"
         echo "containers<<EOF" >> $GITHUB_ENV
         echo "${CONTAINERS}" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
-        echo ${{ env.containers }}
+    - id: debug
+      run: |
+        echo "test2: ${{ env.containers }}"
 
   hadolint:
     name: Run hadolint
