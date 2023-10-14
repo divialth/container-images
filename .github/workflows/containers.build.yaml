@@ -62,7 +62,7 @@ jobs:
       id-token: write # for creating OIDC tokens for signing.
       packages: write # for uploading attestations.
     name: Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs:
     - hadolint
     - changes
