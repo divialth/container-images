@@ -96,7 +96,7 @@ jobs:
         if [ "${{github.event_name}}" == "pull_request" ]; then
           echo "push=false" >> $GITHUB_OUTPUT
           echo "cache_from=\"type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache\"" >> $GITHUB_OUTPUT || echo "cache_from=''" >> $GITHUB_OUTPUT
-          echo "cache_to=''" >> $GITHUB_OUTPUT
+          echo 'cache_to=""' >> $GITHUB_OUTPUT
         else
           echo "push=true" >> $GITHUB_OUTPUT
           echo "cache_from=\"type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache\"" >> $GITHUB_OUTPUT
