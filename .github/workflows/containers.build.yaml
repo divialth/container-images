@@ -61,7 +61,6 @@ jobs:
   build:
     permissions:
       actions: read # for detecting the Github Actions environment.
-      id-token: write # for creating OIDC tokens for signing.
       packages: write # for uploading attestations.
     name: Build
     runs-on: ubuntu-latest
@@ -154,6 +153,7 @@ jobs:
     steps:
       - name: complete message
         run: echo "Container Build and Tests Completed Successfully"
+
 # NOTE
 # many of this code was copied from the great workflow of truechats/containers
 # https://github.com/truecharts/containers/blob/master/.github/workflows/containers.build.yaml
