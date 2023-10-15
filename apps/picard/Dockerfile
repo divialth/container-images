@@ -20,7 +20,7 @@ RUN \
     /tmp/*
 
 # add local files
-COPY ./root /
+COPY ./apps/picard/root /
 
 # ports and volumes
 EXPOSE 3000
