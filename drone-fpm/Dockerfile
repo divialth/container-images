@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ruby-30@sha256:27bd7e2f055c80ff3080f9364a9e5495234a0070c5fec52ce1d2de37f2e939f6
+FROM registry.access.redhat.com/ubi8/ruby-30@sha256:6b58733a57c24acc55aece0f7482580746d3cc6bf975f5423af7a027bfef53cc
 
 USER root
 
