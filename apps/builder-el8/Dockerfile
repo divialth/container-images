@@ -1,5 +1,6 @@
-FROM rockylinux:8@sha256:85fa0b733cfbcc6e9770829b69ebcc58f51ff71fc9c0f4f5cdf40e3c7f58ccad
+FROM rockylinux:8@sha256:c464612ef7e3d54d658c3eaa4778b5cdc990ec7a4d9ab63b0f00c9994c6ce980
 
+# hadolint ignore=DL3002
 USER root
 
 RUN yum install -y rpm-build rpm-sign python3-devel && \
