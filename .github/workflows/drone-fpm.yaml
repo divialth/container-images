@@ -6,12 +6,12 @@ on:
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
     paths:
-      - .github/workflows/drone-fpm.yml
+      - .github/workflows/drone-fpm.yaml
       - drone-fpm/**
   pull_request:
     branches: [ main ]
     paths:
-      - .github/workflows/drone-fpm.yml
+      - .github/workflows/drone-fpm.yaml
       - drone-fpm/**
 
 env:
