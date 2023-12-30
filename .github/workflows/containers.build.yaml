@@ -47,12 +47,12 @@ jobs:
   hadolint:
     name: Run hadolint
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: hadolint
         uses: reviewdog/action-hadolint@fbda56f005550d67ea4d4950d96571d01313ea17 # v1.36.1
+        if: github.event_name == 'pull_request'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
