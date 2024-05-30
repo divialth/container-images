@@ -1,4 +1,4 @@
-FROM rockylinux:8@sha256:d5a5e761584609184c7609b4ecdc9ecf13be048fa80299cff10519d52e734ac7
+FROM rockylinux:8@sha256:9794037624aaa6212aeada1d28861ef5e0a935adaf93e4ef79837119f2a2d04c
 
 # hadolint ignore=DL3002
 USER root
