@@ -5,7 +5,7 @@
     "config:recommended",
     "default:automergeDigest",
     "docker:disableMajor",
-    "regexManagers:dockerfileVersions",
-    "regexManagers:githubActionsVersions"
+    "customManagers:dockerfileVersions",
+    "customManagers:githubActionsVersions"
   ]
 }
