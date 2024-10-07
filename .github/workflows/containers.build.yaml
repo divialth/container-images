@@ -26,7 +26,7 @@ jobs:
       matrix: '{"container": ${{ env.containers }} }'
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
       - name: hadolint
         uses: reviewdog/action-hadolint@2d90b15b2b969e507fc2a31af6e29ca19a0f9516 # v1.45.0
         if: github.event_name == 'pull_request'
@@ -74,7 +74,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci-skip]') && needs.changes.outputs.matrix != '' && toJson(fromJson(needs.changes.outputs.matrix)) != '[]'"
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
 
       # Define if tests and push should be run against which versions/platforms
       - name: Prepare
