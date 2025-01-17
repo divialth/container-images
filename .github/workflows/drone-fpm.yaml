@@ -20,7 +20,7 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: divialth/drone-fpm
   # renovate: datasource=rubygems depName=fpm versioning=ruby
-  FPM_VERSION: 1.15.1
+  FPM_VERSION: 1.16.0
 
 
 jobs:
