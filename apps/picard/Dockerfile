@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine318@sha256:c303c9bdab5b11f942b5d5ba4f23f673341408dfdbd0b89b631a705d2c9cdd63
+FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine321@sha256:c3aacba9f786241cd3be3d92f5fa76b687cfe51660556dafd91b28a8bc43e33b
 
 # set version label
 ARG BUILD_DATE
@@ -8,8 +8,8 @@ LABEL maintainer="divialth"
 
 # title
 ENV TITLE=Picard
-# renovate: datasource=repology depName=alpine_3_18/picard versioning=loose
-ENV PICARD_VERSION="2.8.5-r2"
+# renovate: datasource=repology depName=alpine_3_21/picard versioning=loose
+ENV PICARD_VERSION="2.12.3-r0"
 
 RUN \
     echo "**** install packages ****" && \
