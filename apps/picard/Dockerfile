@@ -8,8 +8,8 @@ LABEL maintainer="divialth"
 
 # title
 ENV TITLE=Picard
-# renovate: datasource=repology depName=alpine_3_18/picard versioning=loose
-ENV PICARD_VERSION="2.8.5-r2"
+# renovate: datasource=repology depName=alpine_3_21/picard versioning=loose
+ENV PICARD_VERSION="2.12.3-r0"
 
 RUN \
     echo "**** install packages ****" && \
