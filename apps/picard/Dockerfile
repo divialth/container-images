@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine321@sha256:57f51e8e399e62e821e7c6bd5e1197b5878169a1ed75dabf9ddfddb56df08601
+FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine321@sha256:af25e8504a1bf5c3db15dbd9437c359ce544c049d8daa48e72441478ece2ae8a
 
 # set version label
 ARG BUILD_DATE
