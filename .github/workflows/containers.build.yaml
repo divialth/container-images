@@ -111,10 +111,12 @@ jobs:
             echo 'push=false' >> $GITHUB_OUTPUT
             echo 'cache_from="type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache"' >> $GITHUB_OUTPUT || echo 'cache_from=""' >> $GITHUB_OUTPUT
             echo 'cache_to=""' >> $GITHUB_OUTPUT
+            echo "extra_tag=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
             echo 'push=true' >> $GITHUB_OUTPUT
             echo 'cache_from="type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache"' >> $GITHUB_OUTPUT
             echo 'cache_to="type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache,mode=max"' >> $GITHUB_OUTPUT
+            echo 'extra_tag=' >> $GITHUB_OUTPUT
           fi
 
       - name: Set up QEMU
@@ -158,17 +160,18 @@ jobs:
           file: ./${{ steps.prep.outputs.category }}/${{ matrix.container }}/Dockerfile
           push: ${{ steps.prep.outputs.push }}
           load: ${{ steps.prep.outputs.push == 'false' }}
-          outputs: ${{ steps.prep.outputs.push == 'false' && format('type=oci,dest=/tmp/{0}.tar', matrix.container) || '' }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: ${{ steps.prep.outputs.cache_from }}
           cache-to: ${{ steps.prep.outputs.cache_to }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.prep.outputs.extra_tag }}
 
       - name: Trivy scan (PR, comment)
         if: github.event_name == 'pull_request'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
         with:
-          input: /tmp/${{ matrix.container }}.tar
+          image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
           format: table
           output: trivy-${{ matrix.container }}.txt
