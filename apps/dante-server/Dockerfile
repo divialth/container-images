@@ -24,5 +24,3 @@ COPY ./apps/dante-server/root /
 EXPOSE 1080
 
 VOLUME /config
-
-# debug
