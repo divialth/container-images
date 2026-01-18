@@ -45,7 +45,7 @@ jobs:
       - run: echo '${{ toJson(steps.filter.outputs) }}' > changes.json
       - id: reduce
         run: |
-          CONTAINERS=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)
+          CONTAINERS=$(jq -r '.changed_files | fromjson | map(split("/")[1]) | unique | @json' changes.json)
           if [ -z "${CONTAINERS}" ] || [ "${CONTAINERS}" = "[]" ]; then
             MATRIX='{"container":["__skip__"]}'
             HAS_CHANGES=false
