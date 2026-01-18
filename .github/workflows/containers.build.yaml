@@ -1,6 +1,10 @@
 ---
 name: "Containers: Test-and-Build"
 
+concurrency:
+  group: containers-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
   push:
@@ -71,6 +75,8 @@ jobs:
     permissions:
       actions: read  # for detecting the Github Actions environment.
       packages: write  # for uploading attestations.
+      contents: read  # required by checkout.
+      pull-requests: write  # needed for PR comments.
     name: Build
     runs-on: ubuntu-latest
     needs:
@@ -112,6 +118,7 @@ jobs:
           fi
 
       - name: Set up QEMU
+        if: steps.prep.outputs.platform != 'linux/amd64'
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130  # v3
 
       - name: Log into registry GHCR
@@ -151,6 +158,7 @@ jobs:
           file: ./${{ steps.prep.outputs.category }}/${{ matrix.container }}/Dockerfile
           push: ${{ steps.prep.outputs.push }}
           load: ${{ steps.prep.outputs.push == 'false' }}
+          outputs: ${{ steps.prep.outputs.push == 'false' && format('type=oci,dest=/tmp/{0}.tar', matrix.container) || '' }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: ${{ steps.prep.outputs.cache_from }}
           cache-to: ${{ steps.prep.outputs.cache_to }}
@@ -160,7 +168,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
         with:
-          image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:pr-${{ github.event.pull_request.number }}
+          input: /tmp/${{ matrix.container }}.tar
           severity: CRITICAL,HIGH
           format: table
           output: trivy-${{ matrix.container }}.txt
