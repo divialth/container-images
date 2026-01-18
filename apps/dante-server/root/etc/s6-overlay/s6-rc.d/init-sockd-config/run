@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+if [[ ! -f "/config/sockd.conf" ]]; then
+    cp -a /defaults/sockd.conf /config/sockd.conf
+fi
+
+if [[ -z ${LSIO_NON_ROOT_USER} ]]; then
+    lsiown -R abc:abc \
+        /config
+fi
