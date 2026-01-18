@@ -158,7 +158,7 @@ jobs:
 
       - name: Trivy scan (PR, comment)
         if: github.event_name == 'pull_request'
-        uses: aquasecurity/trivy-action@d53357441e5f234f4601b957a534e5895b58e97c  # v0.18.0
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:pr-${{ github.event.pull_request.number }}
           severity: CRITICAL,HIGH
@@ -193,7 +193,7 @@ jobs:
 
       - name: Trivy scan (push, SARIF)
         if: github.event_name != 'pull_request'
-        uses: aquasecurity/trivy-action@d53357441e5f234f4601b957a534e5895b58e97c  # v0.18.0
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.push.outputs.digest }}
           severity: CRITICAL,HIGH
