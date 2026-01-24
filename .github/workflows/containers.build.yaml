@@ -112,7 +112,7 @@ jobs:
             echo 'push=false' >> $GITHUB_OUTPUT
             echo 'cache_from="type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache"' >> $GITHUB_OUTPUT || echo 'cache_from=""' >> $GITHUB_OUTPUT
             echo 'cache_to=""' >> $GITHUB_OUTPUT
-            echo "extra_tag=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "extra_tag=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" >> $GITHUB_OUTPUT
           else
             echo 'push=true' >> $GITHUB_OUTPUT
             echo 'cache_from="type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}:buildcache"' >> $GITHUB_OUTPUT
@@ -177,7 +177,7 @@ jobs:
           TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
-          image-ref: ${{ steps.push.outputs.imageid }}
+          image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           list-all-pkgs: false
