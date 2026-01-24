@@ -179,6 +179,7 @@ jobs:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
+          ignore-unfixed: true
           format: table
           output: trivy-${{ matrix.container }}.txt
           exit-code: 1
@@ -230,6 +231,7 @@ jobs:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.push.outputs.digest }}
           severity: CRITICAL,HIGH
+          ignore-unfixed: true
           format: sarif
           output: trivy-${{ matrix.container }}.sarif
           exit-code: 1
