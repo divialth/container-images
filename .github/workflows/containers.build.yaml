@@ -167,8 +167,8 @@ jobs:
       - name: Inspect built image (PR)
         if: github.event_name == 'pull_request'
         run: |
-          docker image inspect ${{ steps.push.outputs.imageid }} >/dev/null
-          docker run --rm ${{ steps.push.outputs.imageid }} /bin/sh -c '\
+          docker image inspect ${{ steps.prep.outputs.extra_tag }} >/dev/null
+          docker run --rm ${{ steps.prep.outputs.extra_tag }} /bin/sh -c '\
             if command -v apk >/dev/null 2>&1; then \
               echo "== apk packages ==" && apk info -v; \
             elif command -v dpkg-query >/dev/null 2>&1; then \
@@ -179,10 +179,6 @@ jobs:
               echo "No known package manager found"; \
             fi'
 
-      - name: Save built image as tar (PR)
-        if: github.event_name == 'pull_request'
-        run: docker save ${{ steps.push.outputs.imageid }} -o /tmp/${{ matrix.container }}.tar
-
       - name: Trivy scan (PR, comment)
         id: trivy_pr
         continue-on-error: true
@@ -192,7 +188,7 @@ jobs:
           TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
-          input: /tmp/${{ matrix.container }}.tar
+          image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           list-all-pkgs: false
