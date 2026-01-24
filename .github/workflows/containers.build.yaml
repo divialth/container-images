@@ -181,16 +181,7 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           list-all-pkgs: false
-          format: template
-          template: |
-            {{- range .Results -}}
-            {{- if .Vulnerabilities -}}
-            Target: {{ .Target }}
-            {{- range .Vulnerabilities }}
-              - {{ .Severity }} {{ .VulnerabilityID }} {{ .PkgName }} {{ .InstalledVersion }} -> {{ .FixedVersion }}
-            {{- end }}
-            {{- end -}}
-            {{- end -}}
+          format: table
           output: trivy-${{ matrix.container }}.txt
           exit-code: 1
 
@@ -204,21 +195,23 @@ jobs:
             const filePath = 'trivy-${{ matrix.container }}.txt';
             let body;
             if (fs.existsSync(filePath)) {
-              const content = fs.readFileSync(filePath, 'utf8').split('\n');
-              const maxLines = 120;
-              body = [
-                'Trivy Container Scan (PR)',
-                '',
-                '```',
-                ...content.slice(0, maxLines),
-                content.length > maxLines ? '... output truncated ...' : '',
-                '```'
-              ].join('\n');
+            const content = fs.readFileSync(filePath, 'utf8').split('\n');
+            body = [
+              'Trivy Container Scan (PR)',
+              '',
+              '<details><summary>Scan Output</summary>',
+              '',
+              '```',
+              ...content,
+              '```',
+              '',
+              '</details>'
+            ].join('\n');
             } else {
               body = [
                 'Trivy Container Scan (PR)',
                 '',
-                '_Kein Ausgabefile gefunden; Trivy ist vermutlich vorher fehlgeschlagen._'
+                '_No output file found; Trivy probably failed previously._'
               ].join('\n');
             }
             await github.rest.issues.createComment({
