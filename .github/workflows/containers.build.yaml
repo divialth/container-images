@@ -177,7 +177,7 @@ jobs:
           TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
-          image-ref: ${{ steps.prep.outputs.extra_tag }}
+          image-ref: ${{ steps.push.outputs.imageid }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           list-all-pkgs: false
