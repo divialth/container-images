@@ -181,7 +181,16 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           list-all-pkgs: false
-          format: table
+          format: template
+          template: |
+            {{- range .Results -}}
+            {{- if .Vulnerabilities -}}
+            Target: {{ .Target }}
+            {{- range .Vulnerabilities }}
+              - {{ .Severity }} {{ .VulnerabilityID }} {{ .PkgName }} {{ .InstalledVersion }} -> {{ .FixedVersion }}
+            {{- end }}
+            {{- end -}}
+            {{- end -}}
           output: trivy-${{ matrix.container }}.txt
           exit-code: 1
 
