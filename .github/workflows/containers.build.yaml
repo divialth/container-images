@@ -169,9 +169,14 @@ jobs:
             ${{ steps.prep.outputs.extra_tag }}
 
       - name: Trivy scan (PR, comment)
+        id: trivy_pr
+        continue-on-error: true
         if: github.event_name == 'pull_request'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
+        env:
+          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
+          version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
           format: table
@@ -179,23 +184,32 @@ jobs:
           exit-code: 1
 
       - name: Comment Trivy result on PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd  # v8.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const filePath = 'trivy-${{ matrix.container }}.txt';
-            const content = fs.readFileSync(filePath, 'utf8').split('\n');
-            const maxLines = 120;
-            const body = [
-              'Trivy Container Scan (PR)',
-              '',
-              '```',
-              ...content.slice(0, maxLines),
-              content.length > maxLines ? '... output truncated ...' : '',
-              '```'
-            ].join('\n');
+            let body;
+            if (fs.existsSync(filePath)) {
+              const content = fs.readFileSync(filePath, 'utf8').split('\n');
+              const maxLines = 120;
+              body = [
+                'Trivy Container Scan (PR)',
+                '',
+                '```',
+                ...content.slice(0, maxLines),
+                content.length > maxLines ? '... output truncated ...' : '',
+                '```'
+              ].join('\n');
+            } else {
+              body = [
+                'Trivy Container Scan (PR)',
+                '',
+                '_Kein Ausgabefile gefunden; Trivy ist vermutlich vorher fehlgeschlagen._'
+              ].join('\n');
+            }
             await github.rest.issues.createComment({
               issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
@@ -203,10 +217,17 @@ jobs:
               body
             });
 
+      - name: Fail if Trivy failed (PR)
+        if: github.event_name == 'pull_request' && steps.trivy_pr.outcome == 'failure'
+        run: exit 1
+
       - name: Trivy scan (push, SARIF)
         if: github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
+        env:
+          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
+          version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.push.outputs.digest }}
           severity: CRITICAL,HIGH
           format: sarif
