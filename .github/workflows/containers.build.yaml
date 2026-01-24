@@ -180,6 +180,7 @@ jobs:
           image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+          list-all-pkgs: false
           format: table
           output: trivy-${{ matrix.container }}.txt
           exit-code: 1
@@ -232,6 +233,7 @@ jobs:
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.push.outputs.digest }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+          list-all-pkgs: false
           format: sarif
           output: trivy-${{ matrix.container }}.sarif
           exit-code: 1
