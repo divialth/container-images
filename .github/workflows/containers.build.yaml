@@ -157,6 +157,8 @@ jobs:
           file: ./${{ steps.prep.outputs.category }}/${{ matrix.container }}/Dockerfile
           push: ${{ steps.prep.outputs.push }}
           load: ${{ steps.prep.outputs.push == 'false' }}
+          pull: true
+          no-cache: true
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
             ${{ steps.meta.outputs.tags }}
@@ -177,6 +179,10 @@ jobs:
               echo "No known package manager found"; \
             fi'
 
+      - name: Save built image as tar (PR)
+        if: github.event_name == 'pull_request'
+        run: docker save ${{ steps.push.outputs.imageid }} -o /tmp/${{ matrix.container }}.tar
+
       - name: Trivy scan (PR, comment)
         id: trivy_pr
         continue-on-error: true
@@ -186,7 +192,7 @@ jobs:
           TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
-          image-ref: ${{ steps.push.outputs.imageid }}
+          input: /tmp/${{ matrix.container }}.tar
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           list-all-pkgs: false
