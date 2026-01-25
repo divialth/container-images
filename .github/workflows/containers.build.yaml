@@ -184,17 +184,15 @@ jobs:
         continue-on-error: true
         if: github.event_name == 'pull_request'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
-        env:
-          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ${{ steps.prep.outputs.extra_tag }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          list-all-pkgs: false
           format: table
           output: trivy-${{ matrix.container }}.txt
           exit-code: 1
+          skip-dirs: /lsiopy
 
       - name: Comment Trivy result on PR
         if: github.event_name == 'pull_request' && always()
@@ -206,17 +204,19 @@ jobs:
             const filePath = 'trivy-${{ matrix.container }}.txt';
             let body;
             if (fs.existsSync(filePath)) {
-            const content = fs.readFileSync(filePath, 'utf8').split('\n');
+            const content = fs.readFileSync(filePath, 'utf8').trimEnd().split('\n');
+            const folded = content.length > 10;
+            const preamble = ['Trivy Container Scan (PR)', ''];
+            const header = folded ? '<details><summary>Scan Output</summary>' : 'Scan Output';
+            const footer = folded ? ['','</details>'] : [];
             body = [
-              'Trivy Container Scan (PR)',
-              '',
-              '<details><summary>Scan Output</summary>',
+              ...preamble,
+              header,
               '',
               '```',
               ...content,
               '```',
-              '',
-              '</details>'
+              ...footer
             ].join('\n');
             } else {
               body = [
@@ -239,17 +239,15 @@ jobs:
       - name: Trivy scan (push, SARIF)
         if: github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
-        env:
-          TRIVY_SKIP_VERSION_CHECK: "true"
         with:
           version: v0.68.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.push.outputs.digest }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
-          list-all-pkgs: false
           format: sarif
           output: trivy-${{ matrix.container }}.sarif
           exit-code: 1
+          skip-dirs: /lsiopy
 
       - name: Upload SARIF to Security tab
         if: github.event_name != 'pull_request'

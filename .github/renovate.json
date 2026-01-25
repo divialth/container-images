@@ -7,5 +7,15 @@
     "docker:disableMajor",
     "customManagers:dockerfileVersions",
     "customManagers:githubActionsVersions"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+      "matchStrings": [
+        "version:\\s*(?<currentValue>[^\\s#]+)\\s*#\\s*renovate:\\s*datasource=(?<datasource>[^\\s]+)\\s*depName=(?<depName>[^\\s]+)"
+      ],
+      "datasourceTemplate": "{{{datasource}}}",
+      "depNameTemplate": "{{{depName}}}"
+    }
   ]
 }
