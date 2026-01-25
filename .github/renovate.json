@@ -8,9 +8,12 @@
     "customManagers:dockerfileVersions",
     "customManagers:githubActionsVersions"
   ],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/.*\\.ya?ml$/"
+      ],
       "matchStrings": [
         "version:\\s*(?<currentValue>[^\\s#]+)\\s*#\\s*renovate:\\s*datasource=(?<datasource>[^\\s]+)\\s*depName=(?<depName>[^\\s]+)"
       ],
