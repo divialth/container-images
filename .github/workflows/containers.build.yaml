@@ -201,36 +201,59 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.payload.pull_request.number;
+            const marker = 'Trivy Container Scan (PR)';
             const filePath = 'trivy-${{ matrix.container }}.txt';
             let body;
             if (fs.existsSync(filePath)) {
-            const content = fs.readFileSync(filePath, 'utf8').trimEnd().split('\n');
-            const folded = content.length > 10;
-            const preamble = ['Trivy Container Scan (PR)', ''];
-            const header = folded ? '<details><summary>Scan Output</summary>' : 'Scan Output';
-            const footer = folded ? ['','</details>'] : [];
-            body = [
-              ...preamble,
-              header,
-              '',
-              '```',
-              ...content,
-              '```',
-              ...footer
-            ].join('\n');
+              const content = fs.readFileSync(filePath, 'utf8').trimEnd().split('\n');
+              const folded = content.length > 25;
+              const preamble = [marker, ''];
+              const header = folded ? '<details><summary>Scan Output</summary>' : 'Scan Output';
+              const footer = folded ? ['','</details>'] : [];
+              body = [
+                ...preamble,
+                header,
+                '',
+                '```',
+                ...content,
+                '```',
+                ...footer
+              ].join('\n');
             } else {
               body = [
-                'Trivy Container Scan (PR)',
+                marker,
                 '',
                 '_No output file found; Trivy probably failed previously._'
               ].join('\n');
             }
-            await github.rest.issues.createComment({
-              issue_number: context.payload.pull_request.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100
             });
+            const existing = comments.find(comment =>
+              comment.user?.login === 'github-actions[bot]' &&
+              comment.body?.startsWith(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body
+              });
+            }
 
       - name: Fail if Trivy failed (PR)
         if: github.event_name == 'pull_request' && steps.trivy_pr.outcome == 'failure'
