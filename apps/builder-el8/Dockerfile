@@ -3,6 +3,7 @@ FROM rockylinux/rockylinux:8@sha256:e8a49c5403b687db05d4d67333fa45808fbe74f36e68
 # hadolint ignore=DL3002
 USER root
 
+# hadolint ignore=DL3041,SC2086
 RUN INSTALL_PKGS=" \
     python36-devel \
     rpm-build \
