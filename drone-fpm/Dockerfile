@@ -13,7 +13,6 @@ RUN INSTALL_PKGS=" \
     rubygem-rake \
     " && \
     dnf install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} && \
-    dnf install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} && \
     dnf reinstall -y --setopt=tsflags=nodocs tzdata && \
     dnf -y clean all --enablerepo='*' && \
     rpm -V ${INSTALL_PKGS}
