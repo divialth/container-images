@@ -1,9 +1,22 @@
-FROM registry.access.redhat.com/ubi8/ruby-30@sha256:711491fa85fa3832b82221b56799fa2ac1a20144cce01e7d685d139cf66b18a8
+FROM rockylinux/rockylinux:10-ubi@sha256:505425723e64988f3b2cbf640cdb576597f5e427bc9716a516a6673e49464eb6
 
 USER root
 
-RUN yum install -y --disableplugin=subscription-manager rpm-build && \
-    yum clean all --disableplugin=subscription-manager
+RUN INSTALL_PKGS=" \
+    libffi-devel \
+    redhat-rpm-config \
+    rpm-build \
+    ruby \
+    ruby-bundled-gems \
+    ruby-devel \
+    rubygem-bundler \
+    rubygem-rake \
+    " && \
+    dnf install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} && \
+    dnf install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} && \
+    dnf reinstall -y --setopt=tsflags=nodocs tzdata && \
+    dnf -y clean all --enablerepo='*' && \
+    rpm -V ${INSTALL_PKGS}
 
 # renovate: datasource=rubygems depName=fpm versioning=ruby
 ENV FPM_VERSION 1.17.0
