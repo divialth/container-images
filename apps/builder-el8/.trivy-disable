@@ -1,0 +1,1 @@
+# Trivy scan disabled: this container must keep its specific base OS version to build RPM packages correctly, so we accept the known vulnerabilities on that base image.
