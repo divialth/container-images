@@ -103,6 +103,12 @@ jobs:
           echo "category=${CATEGORY}" >> $GITHUB_OUTPUT
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "platform=${PLATFORM}" >> $GITHUB_OUTPUT
+          if [ -n "${CATEGORY}" ] && test -f "./${CATEGORY}/${{ matrix.container }}/.trivy-disable"; then
+            echo "Trivy disabled via ./${CATEGORY}/${{ matrix.container }}/.trivy-disable"
+            echo 'trivy_disabled=true' >> $GITHUB_OUTPUT
+          else
+            echo 'trivy_disabled=false' >> $GITHUB_OUTPUT
+          fi
           if test -f "./${CATEGORY}/${{ matrix.container }}/goss.yaml"; then
             echo 'goss=true' >> $GITHUB_OUTPUT
           else
@@ -182,7 +188,7 @@ jobs:
       - name: Trivy scan (PR, comment)
         id: trivy_pr
         continue-on-error: true
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
         with:
           version: v0.68.2  # renovate: datasource=github-releases depName=aquasecurity/trivy
@@ -197,6 +203,8 @@ jobs:
       - name: Comment Trivy result on PR
         if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd  # v8.0.0
+        env:
+          TRIVY_DISABLED: ${{ steps.prep.outputs.trivy_disabled }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -204,10 +212,17 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const issue_number = context.payload.pull_request.number;
-            const marker = 'Trivy Container Scan (PR)';
+            const marker = `Trivy Container Scan (PR): ${{ matrix.container }}`;
             const filePath = 'trivy-${{ matrix.container }}.txt';
+            const disabled = process.env.TRIVY_DISABLED === 'true';
             let body;
-            if (fs.existsSync(filePath)) {
+            if (disabled) {
+              body = [
+                marker,
+                '',
+                '_Trivy scan skipped_: disabled via .trivy-disable next to the Dockerfile.'
+              ].join('\n');
+            } else if (fs.existsSync(filePath)) {
               const content = fs.readFileSync(filePath, 'utf8').trimEnd().split('\n');
               const folded = content.length > 25;
               const preamble = [marker, ''];
@@ -256,11 +271,11 @@ jobs:
             }
 
       - name: Fail if Trivy failed (PR)
-        if: github.event_name == 'pull_request' && steps.trivy_pr.outcome == 'failure'
+        if: github.event_name == 'pull_request' && steps.prep.outputs.trivy_disabled != 'true' && steps.trivy_pr.outcome == 'failure'
         run: exit 1
 
       - name: Trivy scan (push, SARIF)
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
         with:
           version: v0.68.2  # renovate: datasource=github-releases depName=aquasecurity/trivy
@@ -273,7 +288,7 @@ jobs:
           skip-dirs: /lsiopy
 
       - name: Upload SARIF to Security tab
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
         uses: github/codeql-action/upload-sarif@b20883b0cd1f46c72ae0ba6d1090936928f9fa30  # v4
         with:
           sarif_file: trivy-${{ matrix.container }}.sarif
