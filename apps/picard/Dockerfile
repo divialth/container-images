@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-selkies:alpine323@sha256:38a3975e3a49d103def0023043ca62d84e6915757f93601642ea2caf1fa3833a
+FROM ghcr.io/linuxserver/baseimage-selkies:alpine323@sha256:8a0e917d8e90ec9792bab529aa8745d0e8c9110a87d90602ad7a0f26863764d9
 
 # set version label
 ARG BUILD_DATE
