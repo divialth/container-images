@@ -3,7 +3,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.23@sha256:c6aaa0e75c5656898d47658673
 # set version label
 ARG BUILD_DATE
 ARG VERSION
-LABEL build_version="Version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL build.version="Version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="divialth"
 
 # renovate: datasource=github-releases depName=snail007/goproxy versioning=semver
@@ -13,6 +13,7 @@ ENV GOPROXY_ARGS="http -p :8080"
 ENV GOPROXY_INSTANCES_DIR="/config/instances.d"
 ENV GOPROXY_STRICT_ARGS="true"
 
+# hadolint ignore=DL3018
 RUN \
     echo "**** install runtime dependencies ****" && \
     apk add --no-cache \
