@@ -189,7 +189,7 @@ jobs:
         id: trivy_pr
         continue-on-error: true
         if: github.event_name == 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
+        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284  # 0.34.0
         with:
           version: v0.69.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ${{ steps.prep.outputs.extra_tag }}
@@ -276,7 +276,7 @@ jobs:
 
       - name: Trivy scan (push, SARIF)
         if: github.event_name != 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8  # 0.33.1
+        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284  # 0.34.0
         with:
           version: v0.69.1  # renovate: datasource=github-releases depName=aquasecurity/trivy
           image-ref: ghcr.io/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.push.outputs.digest }}
