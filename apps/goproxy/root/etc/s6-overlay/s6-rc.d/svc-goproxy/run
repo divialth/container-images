@@ -1,0 +1,85 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+set -Eeo pipefail
+
+run_plain_mode() {
+    local proxy_args=()
+
+    # shellcheck disable=SC2206
+    proxy_args=(${GOPROXY_ARGS:-http -p :8080})
+    if [[ ${#proxy_args[@]} -eq 0 ]]; then
+        echo "No goproxy startup arguments configured for plain mode."
+        exit 1
+    fi
+
+    echo "Starting goproxy in plain mode."
+
+    if [[ -z ${LSIO_NON_ROOT_USER} ]]; then
+        exec 2>&1 \
+            s6-setuidgid abc /usr/local/bin/proxy "${proxy_args[@]}"
+    else
+        exec 2>&1 \
+            /usr/local/bin/proxy "${proxy_args[@]}"
+    fi
+}
+
+run_multi_mode() {
+    local run_as_user=""
+    if [[ -z ${LSIO_NON_ROOT_USER} ]]; then
+        run_as_user="abc"
+    fi
+
+    echo "Starting goproxy in multi mode from '${instances_dir}' (strict=${strict_raw})."
+
+    exec 2>&1 \
+        /usr/local/bin/lsio-multiproc-run \
+            "${instances_dir}" \
+            "${runtime_root}" \
+            "/usr/local/bin/proxy" \
+            "${strict_raw}" \
+            "${run_as_user}"
+}
+
+mode="${GOPROXY_MODE:-auto}"
+mode="${mode,,}"
+strict_raw="${GOPROXY_STRICT_ARGS:-true}"
+instances_dir="${GOPROXY_INSTANCES_DIR:-/config/instances.d}"
+runtime_root="/run/lsio-multiproc/services"
+
+case "${mode}" in
+    plain)
+        run_plain_mode
+        ;;
+    multi)
+        run_multi_mode
+        ;;
+    auto)
+        tmp_valid="$(mktemp)"
+        set +e
+        /usr/local/bin/lsio-multiproc-parse "${instances_dir}" "${strict_raw}" > "${tmp_valid}"
+        parse_rc=$?
+        set -e
+
+        if [[ ${parse_rc} -eq 0 && -s "${tmp_valid}" ]]; then
+            rm -f "${tmp_valid}"
+            run_multi_mode
+        elif [[ ${parse_rc} -eq 0 ]]; then
+            rm -f "${tmp_valid}"
+            echo "No valid multi-instance files found in '${instances_dir}', falling back to plain mode."
+            run_plain_mode
+        else
+            rm -f "${tmp_valid}"
+            if [[ "${strict_raw,,}" =~ ^(1|true|yes|on)$ ]]; then
+                echo "Failed to parse '${instances_dir}' in auto mode with strict parsing enabled."
+                exit 1
+            fi
+            echo "Could not parse '${instances_dir}', falling back to plain mode."
+            run_plain_mode
+        fi
+        ;;
+    *)
+        echo "Invalid GOPROXY_MODE '${mode}'. Expected: auto, plain, multi."
+        exit 1
+        ;;
+esac

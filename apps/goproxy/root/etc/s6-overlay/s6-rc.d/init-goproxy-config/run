@@ -1,0 +1,24 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+if [[ ! -f "/config/blocked" && -f "/defaults/proxy/blocked" ]]; then
+    cp -a /defaults/proxy/blocked /config/blocked
+fi
+
+if [[ ! -f "/config/direct" && -f "/defaults/proxy/direct" ]]; then
+    cp -a /defaults/proxy/direct /config/direct
+fi
+
+if [[ ! -f "/config/proxy.crt" ]]; then
+    /usr/local/bin/proxy keygen -C /config/proxy >/dev/null 2>&1 || true
+fi
+
+instances_dir="${GOPROXY_INSTANCES_DIR:-/config/instances.d}"
+if ! mkdir -p "${instances_dir}"; then
+    echo "Warning: failed to create GOPROXY_INSTANCES_DIR at '${instances_dir}'." >&2
+fi
+
+if [[ -z ${LSIO_NON_ROOT_USER} ]]; then
+    lsiown -R abc:abc \
+        /config
+fi

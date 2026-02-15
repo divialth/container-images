@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+
+instances_dir="${1:-}"
+runtime_root="${2:-}"
+exec_path="${3:-}"
+strict_raw="${4:-true}"
+run_as_user="${5:-}"
+
+if [[ -z "${instances_dir}" || -z "${runtime_root}" || -z "${exec_path}" ]]; then
+    echo "Usage: lsio-multiproc-render-services <instances_dir> <runtime_root> <exec_path> [strict] [run_as_user]" >&2
+    exit 1
+fi
+
+if [[ "${runtime_root}" == "/" ]]; then
+    echo "Refusing to use '/' as runtime_root." >&2
+    exit 1
+fi
+
+tmp_entries="$(mktemp)"
+trap 'rm -f "${tmp_entries}"' EXIT
+
+if ! /usr/local/bin/lsio-multiproc-parse "${instances_dir}" "${strict_raw}" > "${tmp_entries}"; then
+    exit 1
+fi
+
+mapfile -t entries < "${tmp_entries}"
+if [[ ${#entries[@]} -eq 0 ]]; then
+    exit 2
+fi
+
+rm -rf "${runtime_root}"
+mkdir -p "${runtime_root}"
+
+for entry in "${entries[@]}"; do
+    instance_name="${entry%%$'\t'*}"
+    instance_file="${entry#*$'\t'}"
+
+    svc_dir="${runtime_root}/${instance_name}"
+    mkdir -p "${svc_dir}"
+
+    instance_file_q="$(printf '%q' "${instance_file}")"
+    exec_path_q="$(printf '%q' "${exec_path}")"
+    run_as_user_q="$(printf '%q' "${run_as_user}")"
+
+    cat > "${svc_dir}/run" <<EOF
+#!/usr/bin/env bash
+set -Eeo pipefail
+
+instance_file=${instance_file_q}
+exec_path=${exec_path_q}
+run_as_user=${run_as_user_q}
+args=()
+
+while IFS= read -r line || [[ -n "\${line}" ]]; do
+    [[ "\${line}" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "\${line//[[:space:]]/}" ]] && continue
+    args+=("\${line}")
+done < "\${instance_file}"
+
+if [[ \${#args[@]} -eq 0 ]]; then
+    echo "No executable arguments found in \${instance_file}" >&2
+    exit 1
+fi
+
+if [[ -n "\${run_as_user}" ]]; then
+    exec s6-setuidgid "\${run_as_user}" "\${exec_path}" "\${args[@]}"
+else
+    exec "\${exec_path}" "\${args[@]}"
+fi
+EOF
+
+    chmod 0755 "${svc_dir}/run"
+done

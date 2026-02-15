@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+
+instances_dir="${1:-}"
+strict_raw="${2:-true}"
+
+if [[ -z "${instances_dir}" ]]; then
+    echo "Usage: lsio-multiproc-parse <instances_dir> [strict]" >&2
+    exit 1
+fi
+
+is_true() {
+    case "${1,,}" in
+        1|true|yes|on) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+strict=false
+if is_true "${strict_raw}"; then
+    strict=true
+fi
+
+if [[ ! -d "${instances_dir}" ]]; then
+    exit 0
+fi
+
+shopt -s nullglob
+declare -A seen_names=()
+
+for file in "${instances_dir}"/*.args; do
+    [[ -f "${file}" ]] || continue
+
+    base_name="$(basename "${file}")"
+    raw_name="${base_name%.args}"
+    safe_name="${raw_name//[^A-Za-z0-9._-]/-}"
+    safe_name="${safe_name#-}"
+    safe_name="${safe_name%-}"
+
+    if [[ -z "${safe_name}" || "${safe_name}" != "${raw_name}" ]]; then
+        if [[ "${strict}" == "true" ]]; then
+            echo "Invalid instance filename '${base_name}'. Only [A-Za-z0-9._-] are allowed." >&2
+            exit 1
+        else
+            echo "Skipping invalid instance filename '${base_name}'." >&2
+            continue
+        fi
+    fi
+
+    if [[ -n "${seen_names[${safe_name}]:-}" ]]; then
+        if [[ "${strict}" == "true" ]]; then
+            echo "Duplicate instance name '${safe_name}' from '${base_name}' and '${seen_names[${safe_name}]}'." >&2
+            exit 1
+        else
+            echo "Skipping duplicate instance name '${safe_name}' from '${base_name}'." >&2
+            continue
+        fi
+    fi
+
+    arg_count=0
+    while IFS= read -r line || [[ -n "${line}" ]]; do
+        [[ "${line}" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line//[[:space:]]/}" ]] && continue
+        arg_count=$((arg_count + 1))
+    done < "${file}"
+
+    if [[ ${arg_count} -eq 0 ]]; then
+        if [[ "${strict}" == "true" ]]; then
+            echo "Instance file '${base_name}' has no executable arguments." >&2
+            exit 1
+        else
+            echo "Skipping empty instance file '${base_name}'." >&2
+            continue
+        fi
+    fi
+
+    seen_names["${safe_name}"]="${base_name}"
+    printf '%s\t%s\n' "${safe_name}" "${file}"
+done
