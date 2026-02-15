@@ -1,0 +1,6 @@
+# SOCKS proxy listener
+socks
+-p
+:1080
+--intelligent
+direct

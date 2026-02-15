@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+
+instances_dir="${1:-}"
+runtime_root="${2:-}"
+exec_path="${3:-}"
+strict_raw="${4:-true}"
+run_as_user="${5:-}"
+
+if [[ -z "${instances_dir}" || -z "${runtime_root}" || -z "${exec_path}" ]]; then
+    echo "Usage: lsio-multiproc-run <instances_dir> <runtime_root> <exec_path> [strict] [run_as_user]" >&2
+    exit 1
+fi
+
+set +e
+/usr/local/bin/lsio-multiproc-render-services "${instances_dir}" "${runtime_root}" "${exec_path}" "${strict_raw}" "${run_as_user}"
+rc=$?
+set -e
+
+if [[ ${rc} -ne 0 ]]; then
+    if [[ ${rc} -eq 2 ]]; then
+        echo "No valid instance files found in '${instances_dir}'." >&2
+        exit 2
+    fi
+    exit "${rc}"
+fi
+
+instances="$(find "${runtime_root}" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | paste -sd, -)"
+echo "Starting nested service supervisor with instances: ${instances}"
+
+exec s6-svscan "${runtime_root}"
