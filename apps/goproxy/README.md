@@ -68,7 +68,7 @@ Sample files are provided in `apps/goproxy/examples/instances.d`.
 ```yaml
 services:
   goproxy:
-    image: ghcr.io/divialth/goproxy:latest
+    image: ghcr.io/divialth/goproxy:main
     container_name: goproxy
     restart: unless-stopped
     ports:
@@ -88,7 +88,7 @@ services:
 ```yaml
 services:
   goproxy:
-    image: ghcr.io/divialth/goproxy:latest
+    image: ghcr.io/divialth/goproxy:main
     container_name: goproxy
     restart: unless-stopped
     ports:
@@ -129,7 +129,7 @@ If no valid instance files are present, it falls back to plain mode (`GOPROXY_AR
 ```yaml
 services:
   goproxy:
-    image: ghcr.io/divialth/goproxy:latest
+    image: ghcr.io/divialth/goproxy:main
     restart: unless-stopped
     ports:
       - "8080:8080"

@@ -6,7 +6,7 @@ ARG VERSION
 LABEL build.version="Version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="divialth"
 
-# renovate: datasource=github-releases depName=snail007/goproxy versioning=semver
+# renovate: datasource=github-releases depName=snail007/goproxy
 ENV GOPROXY_VERSION="v15.2"
 ENV GOPROXY_MODE="auto"
 ENV GOPROXY_ARGS="http -p :8080"
