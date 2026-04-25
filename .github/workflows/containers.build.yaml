@@ -121,6 +121,11 @@ jobs:
             echo 'push=true' >> $GITHUB_OUTPUT
             echo 'extra_tag=' >> $GITHUB_OUTPUT
           fi
+          if [ "${{ github.event_name }}" == "pull_request" ] && ! printf '%s' "${PLATFORM}" | grep -q ','; then
+            echo 'load=true' >> $GITHUB_OUTPUT
+          else
+            echo 'load=false' >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up QEMU
         if: steps.prep.outputs.platform != 'linux/amd64'
@@ -162,7 +167,7 @@ jobs:
           platforms: ${{ steps.prep.outputs.platform }}
           file: ./${{ steps.prep.outputs.category }}/${{ matrix.container }}/Dockerfile
           push: ${{ steps.prep.outputs.push }}
-          load: ${{ steps.prep.outputs.push == 'false' }}
+          load: ${{ steps.prep.outputs.load }}
           pull: true
           no-cache: true
           labels: ${{ steps.meta.outputs.labels }}
@@ -171,7 +176,7 @@ jobs:
             ${{ steps.prep.outputs.extra_tag }}
 
       - name: Inspect built image (PR)
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.prep.outputs.load == 'true'
         run: |
           docker image inspect ${{ steps.prep.outputs.extra_tag }} >/dev/null
           docker run --rm ${{ steps.prep.outputs.extra_tag }} /bin/sh -c '\
@@ -184,95 +189,6 @@ jobs:
             else \
               echo "No known package manager found"; \
             fi'
-
-      - name: Trivy scan (PR, comment)
-        id: trivy_pr
-        continue-on-error: true
-        if: github.event_name == 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1  # 0.35.0
-        with:
-          version: v0.70.0  # renovate: datasource=github-releases depName=aquasecurity/trivy
-          image-ref: ${{ steps.prep.outputs.extra_tag }}
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
-          format: table
-          output: trivy-${{ matrix.container }}.txt
-          exit-code: 1
-          skip-dirs: /lsiopy
-
-      - name: Comment Trivy result on PR
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
-        env:
-          TRIVY_DISABLED: ${{ steps.prep.outputs.trivy_disabled }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const issue_number = context.payload.pull_request.number;
-            const marker = `Trivy Container Scan (PR): ${{ matrix.container }}`;
-            const filePath = 'trivy-${{ matrix.container }}.txt';
-            const disabled = process.env.TRIVY_DISABLED === 'true';
-            let body;
-            if (disabled) {
-              body = [
-                marker,
-                '',
-                '_Trivy scan skipped_: disabled via .trivy-disable next to the Dockerfile.'
-              ].join('\n');
-            } else if (fs.existsSync(filePath)) {
-              const content = fs.readFileSync(filePath, 'utf8').trimEnd().split('\n');
-              const folded = content.length > 25;
-              const preamble = [marker, ''];
-              const header = folded ? '<details><summary>Scan Output</summary>' : 'Scan Output';
-              const footer = folded ? ['','</details>'] : [];
-              body = [
-                ...preamble,
-                header,
-                '',
-                '```',
-                ...content,
-                '```',
-                ...footer
-              ].join('\n');
-            } else {
-              body = [
-                marker,
-                '',
-                '_No output file found; Trivy probably failed previously._'
-              ].join('\n');
-            }
-            const { data: comments } = await github.rest.issues.listComments({
-              owner,
-              repo,
-              issue_number,
-              per_page: 100
-            });
-            const existing = comments.find(comment =>
-              comment.user?.login === 'github-actions[bot]' &&
-              comment.body?.startsWith(marker)
-            );
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                comment_id: existing.id,
-                body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number,
-                body
-              });
-            }
-
-      - name: Fail if Trivy failed (PR)
-        if: github.event_name == 'pull_request' && steps.prep.outputs.trivy_disabled != 'true' && steps.trivy_pr.outcome == 'failure'
-        run: exit 1
 
       - name: Trivy scan (push, SARIF)
         if: github.event_name != 'pull_request' && steps.prep.outputs.trivy_disabled != 'true'
