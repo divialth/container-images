@@ -32,7 +32,7 @@ jobs:
       has_changes: ${{ steps.reduce.outputs.has_changes }}
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
       - name: hadolint
         uses: reviewdog/action-hadolint@921946a7ebaaf08ac72607bad67209f4e52b5407  # v1.50.5
         if: github.event_name == 'pull_request'
@@ -88,7 +88,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci-skip]') && needs.changes.outputs.has_changes == 'true'"
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7
 
       # Define if tests and push should be run against which versions/platforms
       - name: Prepare
