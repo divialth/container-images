@@ -122,7 +122,7 @@ jobs:
           fi
       - name: Set up QEMU
         if: steps.prep.outputs.platform != 'linux/amd64'
-        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8  # v4
+        uses: docker/setup-qemu-action@1f40c72289eff860ee54a304f1438e3cff362e0a  # v4
 
       - name: Log into registry GHCR
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f  # v4
