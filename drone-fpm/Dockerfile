@@ -18,7 +18,7 @@ RUN INSTALL_PKGS=" \
     rpm -V ${INSTALL_PKGS}
 
 # renovate: datasource=rubygems depName=fpm versioning=ruby
-ENV FPM_VERSION 1.17.0
+ENV FPM_VERSION 1.18.0
 RUN gem install --no-document fpm -v ${FPM_VERSION}
 
 COPY entrypoint.sh /bin/entrypoint.sh
