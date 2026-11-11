@@ -63,7 +63,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
       - name: hadolint
-        uses: reviewdog/action-hadolint@921946a7ebaaf08ac72607bad67209f4e52b5407  # v1.50.5
+        uses: reviewdog/action-hadolint@a3bc84c51f4ddbcbc5b91d950d0b66c15c88b113  # v1.56.0
         if: github.event_name == 'pull_request'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
