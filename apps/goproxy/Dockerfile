@@ -7,7 +7,7 @@ LABEL build.version="Version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="divialth"
 
 # renovate: datasource=github-releases depName=snail007/goproxy
-ENV GOPROXY_VERSION="v15.2"
+ENV GOPROXY_VERSION="v15.3"
 ENV GOPROXY_MODE="auto"
 ENV GOPROXY_ARGS="http -p :8080"
 ENV GOPROXY_INSTANCES_DIR="/config/instances.d"
