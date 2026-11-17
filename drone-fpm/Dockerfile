@@ -1,4 +1,4 @@
-FROM rockylinux/rockylinux:10-ubi@sha256:b316080c3c3cc005af04d71e66bc7a4a3efd50dba43dee641efffdddc79c9441
+FROM rockylinux/rockylinux:10-ubi@sha256:0d59f109ca0b9e14c15ff5876e34a7e8026515a3aa65aa577b65129d94196471
 
 USER root
 
